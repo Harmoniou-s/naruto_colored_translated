@@ -3,13 +3,13 @@ from cv2 import cv2, countNonZero, cvtColor
 import numpy as np
 
 def mask_non_colored_image():
-    img1 = Image.open(r"C:/Users/Work/Git/naruto_colored_translated/non_color/Naruto v01/Naruto v1-022.jpg")
-    img2 = Image.open(r"C:/Users/Work/Git/naruto_colored_translated/Naruto color v01-10/Vol 1/00022.jpg")
+    img1 = Image.open(r"C:/Users/Work/Git/naruto_colored_translated/Naruto (2003-2015) (Digital) (AnHeroGold-Empire)/vol 1 uncolored/Naruto v1-032.jpg")
+    img2 = Image.open(r"C:/Users/Work/Git/naruto_colored_translated/NARUTO—ナルト— カラー版 01-72 [aKraa]/Vol 1 colored/NARUTO—ナルト— カラー版 1 - p030 [aKraa].jpg")
     if img2.size[0]/img2.size[1] < 0.7:
         resized_im_1 = img1.resize((780, 1200))
         resized_im_2 = img2.resize((780, 1200))
-        resized_im_1 = crop_left_right(resized_im_1)
-        resized_im_2 = crop_left_right_rgb(resized_im_2)
+        resized_im_1 = crop(resized_im_1)
+        resized_im_2 = crop_rgb(resized_im_2)
         resized_im_1 = resized_im_1.resize((780, 1200))
         resized_im_2 = resized_im_2.resize((780, 1200))
         resized_im_2.save('img2.jpg')
@@ -19,14 +19,13 @@ def mask_non_colored_image():
         for width in range(masked_image.size[0]):
             for height in range(masked_image.size[1]):
                 r,g,b = masked_image_data[width, height]
-                if (r == b and b == g) or (r > 252 and g > 252 and b > 252):
+                if (abs(r-b) < 6 and abs(r-g) < 6 and abs(b-g) < 6):
                     w = image_data_1[width, height]
                     masked_image_data[width, height] = w,w,w
         resized_im_1.save('img1.jpg')
-        
         masked_image.save('masked_image.jpg')
 
-def crop_left_right(img):
+def crop(img):
     left_to_remove = 0
     img_data = img.load()
    
@@ -58,7 +57,6 @@ def crop_left_right(img):
         for width in range(img.size[0]):
             w +=  img_data[width, height]
             if height == 0 and img_data[width, height] != 255:
-                print(img_data[width, height])
                 break
         if w < 185000:
             top_to_remove = height
@@ -79,10 +77,9 @@ def crop_left_right(img):
 
     img = img.crop((left_to_remove, 0, img.width, img.height-bottom_to_remove))
     img = img.crop((0, top_to_remove, img.width - right_to_remove, img.height))
-    print(img.size)
     return img
 
-def crop_left_right_rgb(img):
+def crop_rgb(img):
     left_to_remove = 0
     img_data = img.load()
    
@@ -106,8 +103,7 @@ def crop_left_right_rgb(img):
             w += (r + g + b)
             if width == 0 and (r + g + b) != 765:
                 break
-        print(w)
-        if w < 900000:
+        if w < 850000:
             right_to_remove = width
             break
 
